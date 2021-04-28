@@ -26,7 +26,8 @@ type User struct {
 }
 
 func main() {
-
+	db := InitDB()
+	defer db.Close()
 	r := gin.Default()
 	r.POST("/user/auth/register", func(c *gin.Context) {
 
@@ -51,8 +52,7 @@ func main() {
 			"telephone": telephone,
 		})
 	})
-	r.Run() // 监听并在 0.0.0.0:8080 上启动服务
-	fmt.Println("hello world!")
+	panic(r.Run()) // 监听并在 0.0.0.0:8080 上启动服务
 }
 
 func RandomString(n int) string {
@@ -66,7 +66,6 @@ func RandomString(n int) string {
 }
 
 func InitDB() *gorm.DB {
-	driverName := "mysql"
 	host := "localhost"
 	port := "3306"
 	database := "go_test"
@@ -81,8 +80,6 @@ func InitDB() *gorm.DB {
 		database,
 		charset,
 	)
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	db, err := gorm.Open(driverName, args)
 	db, err := gorm.Open(mysql.Open(args), &gorm.Config{})
 	if err != nil {
 		panic("connect mysql failed err:" + err.Error())
