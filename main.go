@@ -1,14 +1,29 @@
 package main
 
 import (
+	_ "database/sql/driver"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/mysql"
+	_ "gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"math/rand"
 	"net/http"
 	"time"
 )
+
+type Product struct {
+	gorm.Model
+	Code  string
+	Price uint
+}
+
+type User struct {
+	gorm.Model
+	Name      string `gorm:"type:vachar(20); not null "`
+	Telephone string `gorm:"type:vachar(110); not null;unique "`
+	Password  string `gorm:"type:size 255; not null;unique "`
+}
 
 func main() {
 
@@ -48,4 +63,29 @@ func RandomString(n int) string {
 		letters[i] = letters[rand.Intn(len(letters))]
 	}
 	return string(letters)
+}
+
+func InitDB() *gorm.DB {
+	driverName := "mysql"
+	host := "localhost"
+	port := "3306"
+	database := "go_test"
+	username := "root"
+	password := "root"
+	charset := "utf8mb4"
+	args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=true",
+		username,
+		password,
+		host,
+		port,
+		database,
+		charset,
+	)
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(driverName, args)
+	db, err := gorm.Open(mysql.Open(args), &gorm.Config{})
+	if err != nil {
+		panic("connect mysql failed err:" + err.Error())
+	}
+	return db
 }
