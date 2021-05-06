@@ -9,9 +9,8 @@ import (
 )
 
 func main() {
-
-	var _ = common.InitDB()
-	r := gin.Default()
-	CollectRoutes(r)
-	panic(r.Run()) // 监听并在 0.0.0.0:8080 上启动服务
+	var _ = common.InitDB() // 初始化数据库连接
+	r := gin.Default()      // gin 初始化
+	CollectRoutes(r)        //通过路由方法 路由到对应接口
+	panic(r.Run())          // 监听并在 0.0.0.0:8080 上启动服务
 }
