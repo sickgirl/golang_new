@@ -12,11 +12,27 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func Info(c *gin.Context) {
 	user, _ := c.Get("user")
 	response.Success(c, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user.(model.User))}}, "获取用户信息成功")
+}
+
+func Question(c *gin.Context) {
+	user, _ := c.Get("user")
+	uid := user.(model.User).ID
+	times, err := model.UseTimes(c, uid)
+	if err != nil {
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "请求失败请稍后再试")
+		return
+	} else if times < 0 {
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "请求次数已耗尽")
+		return
+	}
+	response.Success(c, gin.H{"code": 200, "data": gin.H{"user": dto.ToUserDto(user.(model.User))}}, "获取用户信息成功")
+	return
 }
 
 func Login(c *gin.Context) {
@@ -53,7 +69,13 @@ func Login(c *gin.Context) {
 		log.Printf("token generate error : %v", err)
 		return
 	}
-	response.Success(c, gin.H{"token": token}, "登陆成功")
+	times, _ := model.GetTimes(c, user.ID)
+	num, err := strconv.Atoi(times)
+	if err != nil {
+		num = 0
+	}
+
+	response.Success(c, gin.H{"token": token, "times": num}, "登陆成功")
 }
 
 func Register(c *gin.Context) {
