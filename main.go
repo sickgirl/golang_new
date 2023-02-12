@@ -4,7 +4,7 @@ package main
 入口文件
 */
 import (
-	"first_go/common"
+	"first_go/db"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"os"
@@ -12,9 +12,9 @@ import (
 
 func main() {
 	InitConfig()
-	var _ = common.InitDB() // 初始化数据库连接
-	r := gin.Default()      // gin 初始化
-	CollectRoutes(r)        //通过路由方法 路由到对应接口
+	var _ = db.InitDB() // 初始化数据库连接
+	r := gin.Default()  // gin 初始化
+	CollectRoutes(r)    //通过路由方法 路由到对应接口
 	port := viper.GetString("sever.port")
 	if port != "" {
 		panic(r.Run(":" + port))
@@ -31,5 +31,4 @@ func InitConfig() {
 	if err != nil {
 		panic("配置文件读取失败")
 	}
-
 }

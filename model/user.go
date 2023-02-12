@@ -2,7 +2,7 @@ package model
 
 //服务类
 import (
-	"first_go/common"
+	"first_go/db"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -22,12 +22,12 @@ type User struct {
 
 func UseTimes(c *gin.Context, uid uint) (int64, error) {
 	key := fmt.Sprintf(TimesGptUser, uid)
-	res := common.Redis.Incr(key)
+	res := db.Redis.Incr(key)
 	return res.Result()
 }
 
 func GetTimes(c *gin.Context, uid uint) (string, error) {
 	key := fmt.Sprintf(TimesGptUser, uid)
-	res := common.Redis.Get(key)
+	res := db.Redis.Get(key)
 	return res.Result()
 }

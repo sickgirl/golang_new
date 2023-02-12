@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"first_go/common"
+	"first_go/db"
 	"first_go/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -22,15 +23,19 @@ func AuthMiddleware() gin.HandlerFunc {
 		tokenString = tokenString[7:]
 		token, claims, err := common.ParseToken(tokenString)
 		if err != nil || !token.Valid {
+			println(err.Error())
 			//解密验证
 			context.JSON(http.StatusUnauthorized, gin.H{"code": 401, "msg": "权限不足2"})
 			context.Abort()
 			return
 		}
 		userId := claims.UserId
-		db := common.GetDb()
+
+		println("test111:", userId)
 		var user model.User
-		db.First(&user, userId)
+		db1 := db.GetDb()
+
+		db1.First(&user, userId)
 		if user.ID == 0 {
 			//用户信息校验
 			context.JSON(http.StatusUnauthorized, gin.H{"code": 401, "msg": "权限不足3"})
